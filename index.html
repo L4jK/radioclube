@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/a316c99708.js" crossorigin="anonymous"></script>
 <style>
 body, html {
   height: 108000px;
@@ -98,11 +98,11 @@ display: inline-block;
     <source src="noise.ogg">
   Your browser does not support the audio element.
   </audio>
-  <a id="playA" class="" onclick="playAudio()">play</a>
+  <a id="playA" class="" style="display:none" onclick="playAudio()">play</a>
   <a id="stopA" class="" style="display:none" onclick="pauseAudio()">stop</a>
-  <a id="muteA" class="" onclick="muteAudio()">volume_up</a>
+  <a id="muteA" class="" style="display:none" onclick="muteAudio()">volume_up</a>
   <a id="umuteA" class="" style="display:none" onclick="umuteAudio()">volume_off</a>
-  <a class=""><input id="radiovol" type="range" min="0%" max="100%" value="100" onchange="setVolume(this.value)"></a>
+  <a class="" style="display:none"><input id="radiovol" type="range" min="0%" max="100%" value="100" onchange="setVolume(this.value)"></a>
   </label>
 <script>
 
@@ -323,14 +323,14 @@ var aud = document.getElementById("playerRadio");
 
 function playAudio() { 
   aud.play(); 
-  document.getElementById("stopA").style.display = "block";
-  document.getElementById("playA").style.display = "none";
+  //document.getElementById("stopA").style.display = "block";
+  //document.getElementById("playA").style.display = "none";
 } 
 
 function pauseAudio() { 
   aud.pause(); 
-  document.getElementById("playA").style.display = "block";
-  document.getElementById("stopA").style.display = "none";
+  //document.getElementById("playA").style.display = "block";
+  //document.getElementById("stopA").style.display = "none";
 } 
 function getVolume() { 
   alert(aud.volume);
@@ -350,22 +350,22 @@ function setFullVolume() {
 
 function muteAudio() { 
   aud.muted = true;
-  document.getElementById("umuteA").style.display = "block";
-  document.getElementById("muteA").style.display = "none";
+  //document.getElementById("umuteA").style.display = "block";
+  //document.getElementById("muteA").style.display = "none";
 } 
 
 function umuteAudio() { 
   aud.muted = false;
-  document.getElementById("muteA").style.display = "block";
-  document.getElementById("umuteA").style.display = "none";
+  //document.getElementById("muteA").style.display = "block";
+  //document.getElementById("umuteA").style.display = "none";
 } 
 
 function checkMute() { 
   alert(aud.muted);
 } 
 function changeradio(sound){
-document.getElementById("playerRadio").setAttribute('src', sound);
-document.getElementById("playerRadio").play();
+//document.getElementById("playerRadio").setAttribute('src', sound);
+//document.getElementById("playerRadio").play();
 }
    </script>
 </body>

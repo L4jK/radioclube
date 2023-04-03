@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<style>
+body, html {
+  height: 108000px;
+  background-color:#3368FF;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+   -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+    -webkit-user-select:none;  
+  -moz-user-select:none;     
+  -ms-user-select:none;      
+  user-select:none;  
+  cursor: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+* {
+  box-sizing: border-box;
+}
+
+
+/* Position text in the middle of the page/image */
+.bg-text {
+  color: #273868;
+  font-weight: bold;
+  font-size: 80px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  padding: 20px;
+  text-align: center;
+}
+
+ @keyframes sinal-pisca {
+     0% { opacity: 0; }
+     50% { opacity: 0.5; }
+     100% { opacity: 1; }
+ }
+.sinal-pisca {
+   -webkit-animation: sinal-pisca .9s linear infinite;
+   -moz-animation: sinal-pisca .9s linear infinite;
+   -ms-animation: sinal-pisca .9s linear infinite;
+   -o-animation: sinal-pisca .9s linear infinite;
+   animation: sinal-pisca .9s linear infinite;
+}
+.displaynone{
+display:none;
+}
+#dial{
+  width:375px;
+}
+#sinal{
+  width:550px;
+}
+#sinalq{
+  width:1150px;
+}
+#volclock{
+}
+.clock{
+display: inline-block;
+}
+#volbi{
+display: inline-block;
+}
+</style>
+</head>
+<body onclick="clickup()" onmousedown="wheelButton(event)">
+<div class="bg-text">
+<div id="volclock">
+<div class="clock"></div>
+<i class="fas fa-volume-up"></i>
+<div id="volbi">I</div>
+</div>
+<div id="dial">FM 87.5</div>
+
+
+<div id="sinal" class="sinal-pisca">
+<i class="fas fa-broadcast-tower"></i> Sem Sinal</div>
+<div id="sinalq" class="displaynone">
+<i class="fas fa-broadcast-tower"></i> Melhor Qualidade de Sinal</div>
+<div id="mic" class="displaynone">Pressione 
+<i class="fas fa-microphone-alt"></i></div>
+
+</div>
+
+<label class="">
+  <audio id="playerRadio" preload="none" onpause="reloadPlayerRadio()" autoplay>
+    <source src="noise.ogg">
+  Your browser does not support the audio element.
+  </audio>
+  <a id="playA" class="" onclick="playAudio()">play</a>
+  <a id="stopA" class="" style="display:none" onclick="pauseAudio()">stop</a>
+  <a id="muteA" class="" onclick="muteAudio()">volume_up</a>
+  <a id="umuteA" class="" style="display:none" onclick="umuteAudio()">volume_off</a>
+  <a class=""><input id="radiovol" type="range" min="0%" max="100%" value="100" onchange="setVolume(this.value)"></a>
+  </label>
+<script>
+
+// When the user scrolls the page, execute myFunction 
+window.onscroll = function() {myFunction()};
+
+function myFunction() {
+  var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  var scrolled = 87.50+((winScroll / height) * 100);
+  if(scrolled.toFixed(1)==="98.3"){
+  document.getElementById("sinal").style.display = "none";
+  document.getElementById("sinalq").style.display = "block";
+  document.getElementById("mic").style.display = "block";
+  changeradio("https://r13.ciclano.io:15003/stream");
+  }else{
+  document.getElementById("sinal").style.display = "block";
+  document.getElementById("sinalq").style.display = "none";
+  document.getElementById("mic").style.display = "none";
+  changeradio("noise.ogg");
+  }
+  
+  
+  document.getElementById("dial").innerHTML = "FM "+scrolled.toFixed(1);
+  
+}
+const getHours = () => {
+  const clock = document.getElementsByClassName('clock')[0]
+  const date = new Date()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const seconds = date.getSeconds()
+  const hour = hours < 10 ? `0${hours}` : hours
+  const minute = minutes < 10 ? `0${minutes}` : minutes
+  const second = seconds < 10 ? `0${seconds}` : seconds
+  clock.innerHTML = `${hour}:${minute}:${second}`
+}
+
+setInterval(() => {
+  getHours()
+}, 1000)
+
+let click = 1;
+function clickup(){
+    if(click<10){
+click = click+1;
+setVolume(click*10);
+}
+var vol = "";
+for(let i=0;i<click;i++){
+vol = vol+"I";
+document.getElementById("volbi").innerHTML = vol;
+}
+}
+function clickdow(){
+if(click>1){
+click = click-1;
+setVolume(click*10);
+}
+var vol = "";
+for(let i=0;i<click;i++){
+vol = vol+"I";
+document.getElementById("volbi").innerHTML = vol;
+}
+}
+const corpo = document.getElementsByTagName("BODY")[0]
+corpo.addEventListener("contextmenu", (e) => {e.preventDefault();clickdow()});
+
+function wheelButton(event) {
+  if(event.button===1){
+    muteAudio();
+    fale("estou ouvindo pode falar!");
+  }
+}
+</script>
+<script>
+  function fale(texto){
+    const recognition = new webkitSpeechRecognition();
+            recognition.interimResults = true;
+            recognition.lang = "pt-BR";
+            recognition.continuous = true;
+     recognition.onend = function(e) {umuteAudio();};       
+            
+  var msg = new SpeechSynthesisUtterance();
+  //var voices = window.speechSynthesis.getVoices();
+  //msg.voice = voices[10]; // Note: some voices don't support altering params
+  //msg.voiceURI = 'native';
+  msg.volume = 1; // 0 to 1
+  //msg.rate = 1.1; // 0.1 to 10
+  //msg.pitch = 0; //0 to 2
+  msg.text = texto;
+  //msg.lang = 'pt-BR';
+  //msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == 'Whisper'; })[0];
+  msg.onstart = function(e) {recognition.stop();muteAudio();};
+  msg.onend = function(e) {
+            muteAudio();
+            recognition.start();
+            // This event happens when you talk in the microphone
+            recognition.onresult = function(event) {
+              for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+                  // Here you can get the string of what you told
+                  const content = event.results[i][0].transcript.trim().toLowerCase();
+                  //output.textContent = content;
+                  console.log(content);
+               
+              if (event.results[i][0].transcript.trim().toLowerCase() === 'qual o seu nome') {
+                  recognition.stop();
+                  msg.text = "meu nome é sexta-feira";
+                  window.speechSynthesis.speak(msg);
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'sexta-feira') {
+                  recognition.stop();
+                   msg.text = "estou ouvindo pode falar!";
+                  window.speechSynthesis.speak(msg);
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'sexta-feira abra a lista de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flasheslista');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'abra a lista de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flasheslista');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'lista de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flasheslista');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'sexta-feira abra rotas e envios') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flashesenvios');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'abra rotas e envios') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flashesenvios');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'rotas e envios') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flashesenvios');
+                  }
+                         if (event.results[i][0].transcript.trim().toLowerCase() === 'sexta-feira abra atualizador de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flashesatualizador');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'abra atualizador de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flashesatualizador');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'atualizador de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  showhidemenu('flashesatualizador');
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'abra o link atualizador de flash') {
+                  recognition.stop();
+                   msg.text = "estou abrindo!";
+                  window.speechSynthesis.speak(msg);
+                  $("#flashesatualizadorlink")[0].click();
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'sexta-feira') {
+                  recognition.stop();
+                   msg.text = "estou ouvindo pode falar!";
+                  window.speechSynthesis.speak(msg);
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'sexta-feira') {
+                  recognition.stop();
+                   msg.text = "estou ouvindo pode falar!";
+                  window.speechSynthesis.speak(msg);
+                  }
+                  if (event.results[i][0].transcript.trim().toLowerCase() === 'fale algo engraçado') {
+                  recognition.stop();
+                   msg.text = "é claro fale qualquer coisa";
+                  window.speechSynthesis.speak(msg);
+                  }else{
+                  //msg.text = "pra passar o tempo enquanto não tenho um comando cadastrado vou te imitar   " + content;
+                  //window.speechSynthesis.speak(msg);
+                  };
+                  
+                  
+                  
+                  
+                   };
+                
+              };
+            };
+          
+    console.log('Finished in ' + event.elapsedTime + ' seconds.');
+  };
+  window.speechSynthesis.speak(msg);
+  
+  };
+  
+  </script>
+  
+  <script>
+                        
+function reloadPlayerRadio(){
+  document.getElementById("playerRadio").load();
+} 
+var aud = document.getElementById("playerRadio"); 
+
+function playAudio() { 
+  aud.play(); 
+  document.getElementById("stopA").style.display = "block";
+  document.getElementById("playA").style.display = "none";
+} 
+
+function pauseAudio() { 
+  aud.pause(); 
+  document.getElementById("playA").style.display = "block";
+  document.getElementById("stopA").style.display = "none";
+} 
+function getVolume() { 
+  alert(aud.volume);
+} 
+  
+function setVolume(v) { 
+  aud.volume = v/100;
+}   
+  
+function setHalfVolume() { 
+  vaud.volume = 0.2;
+} 
+  
+function setFullVolume() { 
+  aud.volume = 1.0;
+} 
+
+function muteAudio() { 
+  aud.muted = true;
+  document.getElementById("umuteA").style.display = "block";
+  document.getElementById("muteA").style.display = "none";
+} 
+
+function umuteAudio() { 
+  aud.muted = false;
+  document.getElementById("muteA").style.display = "block";
+  document.getElementById("umuteA").style.display = "none";
+} 
+
+function checkMute() { 
+  alert(aud.muted);
+} 
+function changeradio(sound){
+document.getElementById("playerRadio").setAttribute('src', sound);
+document.getElementById("playerRadio").play();
+}
+   </script>
+</body>
+</html>
